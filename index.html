@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn"> <!-- HTML ল্যাঙ্গুয়েজ সেট করা হলো বাংলায় -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice Assistant</title>
-    <!-- Tailwind CSS CDN for easy styling -->
+    <title>এআই ভয়েস অ্যাসিস্ট্যান্ট (বাংলা ইনপুট, ইংরেজি আউটপুট)</title> <!-- টাইটেল বাংলায় করা হলো -->
+    <!-- Tailwind CSS CDN সহজ স্টাইলিংয়ের জন্য -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -17,7 +17,7 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            overflow: hidden; /* Prevent scrollbars */
+            overflow: hidden; /* স্ক্রলবার প্রতিরোধ করে */
         }
         .container {
             background-color: rgba(255, 255, 255, 0.1);
@@ -38,12 +38,12 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .microphone-button {
+        .microphone-button, .speaker-button {
             background: linear-gradient(45deg, #10b981 0%, #059669 100%);
             border: none;
             color: white;
             padding: 1.25rem;
-            border-radius: 9999px; /* Fully rounded */
+            border-radius: 9999px; /* সম্পূর্ণ গোলাকার */
             cursor: pointer;
             font-size: 2.5rem;
             display: inline-flex;
@@ -52,19 +52,21 @@
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
             transition: all 0.3s ease;
             position: relative;
-            margin: 0 auto; /* Center the button */
         }
-        .microphone-button:hover {
+        .microphone-button:hover, .speaker-button:hover {
             transform: scale(1.05) translateY(-2px);
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
         }
-        .microphone-button:active {
+        .microphone-button:active, .speaker-button:active {
             transform: scale(0.98);
         }
         .microphone-button.listening {
             animation: pulse 1.5s infinite;
-            background: linear-gradient(45deg, #ef4444 0%, #dc2626 100%); /* Red when listening */
+            background: linear-gradient(45deg, #ef4444 0%, #dc2626 100%); /* শুনছে অবস্থায় লাল */
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+        }
+        .speaker-button.off {
+            background: linear-gradient(45deg, #6b7280 0%, #4b5563 100%); /* বন্ধ অবস্থায় ধূসর */
         }
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
@@ -78,19 +80,22 @@
             min-height: 80px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* লেখা শুরু থেকে সারিবদ্ধ */
             text-align: left;
             word-wrap: break-word;
             line-height: 1.6;
             font-size: 1.1rem;
+            margin-bottom: 0.5rem; /* মেসেজগুলির মধ্যে ব্যবধান */
         }
         .user-message {
             background-color: rgba(147, 197, 253, 0.2);
             color: #e0f2fe;
+            align-self: flex-end; /* ব্যবহারকারীর বার্তা ডানদিকে সারিবদ্ধ */
         }
         .ai-message {
             background-color: rgba(253, 230, 138, 0.2);
             color: #fffbeb;
+            align-self: flex-start; /* এআই বার্তা বামদিকে সারিবদ্ধ */
         }
         .loading-indicator {
             display: none;
@@ -101,13 +106,48 @@
         .loading-indicator.active {
             display: block;
         }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .conversation-history {
+            height: 200px; /* স্ক্রলযোগ্য ইতিহাসের জন্য নির্দিষ্ট উচ্চতা */
+            overflow-y: auto; /* স্ক্রলিং সক্ষম করে */
+            padding: 1rem;
+            border-radius: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .conversation-entry {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            line-height: 1.4;
+            max-width: 80%; /* পৃথক বার্তার সর্বোচ্চ প্রস্থ */
+        }
+        .conversation-entry.user {
+            background-color: rgba(147, 197, 253, 0.3);
+            align-self: flex-end;
+            margin-left: auto; /* ডানদিকে ঠেলে দেয় */
+            color: #e0f2fe;
+        }
+        .conversation-entry.ai {
+            background-color: rgba(253, 230, 138, 0.3);
+            align-self: flex-start;
+            margin-right: auto; /* বামদিকে ঠেলে দেয় */
+            color: #fffbeb;
+        }
 
-        /* Responsive adjustments */
+        /* প্রতিক্রিয়াশীল সমন্বয় */
         @media (max-width: 600px) {
             .container {
                 padding: 1.5rem;
             }
-            .microphone-button {
+            .microphone-button, .speaker-button {
                 font-size: 2rem;
                 padding: 1rem;
             }
@@ -118,101 +158,130 @@
             h1 {
                 font-size: 1.8rem;
             }
+            .controls {
+                gap: 1rem;
+            }
+            .conversation-history {
+                height: 150px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-extrabold mb-4">Voice Assistant</h1>
-        <p class="text-md text-gray-200 mb-6">Press the microphone to start speaking.</p>
+        <h1 class="text-3xl font-extrabold mb-4">ভয়েস অ্যাসিস্ট্যান্ট</h1>
+        <p class="text-md text-gray-200 mb-6">কথা বলা শুরু করতে মাইক্রোফোন বোতাম টিপুন।</p>
 
-        <button id="microphoneBtn" class="microphone-button">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 10.5v3.75m0-7.5V1.5m7.5 7.5h-1.5m-6 0h-3M12 22.5c2.25 0 4.5-.75 4.5-2.25V18a4.5 4.5 0 0 0-4.5-4.5h-1.5a4.5 4.5 0 0 0-4.5 4.5v2.25c0 1.5 2.25 2.25 4.5 2.25z" />
-            </svg>
-        </button>
+        <div class="controls">
+            <button id="microphoneBtn" class="microphone-button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 10.5v3.75m0-7.5V1.5m7.5 7.5h-1.5m-6 0h-3M12 22.5c2.25 0 4.5-.75 4.5-2.25V18a4.5 4.5 0 0 0-4.5-4.5h-1.5a4.5 4.5 0 0 0-4.5 4.5v2.25c0 1.5 2.25 2.25 4.5 2.25z" />
+                </svg>
+            </button>
+            <button id="speakerBtn" class="speaker-button">
+                <!-- স্পিকার চালু আইকন -->
+                <svg id="speakerOnIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.663a9.208 9.208 0 0 0-5.068-5.068C9.535-.29 5.862.137 3.322 2.765a9.208 9.208 0 0 0-2.215 4.41C.603 9.492 1.956 12.022 4.43 13.568a9.208 9.208 0 0 0 5.068 5.068c3.673.29 7.346-.137 9.886-2.765a9.208 9.208 0 0 0 2.215-4.41c.67-2.67-.683-5.2-3.157-6.746Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.114 5.663a9.208 9.208 0 0 0-5.068-5.068C.535-.29 0.862.137 0.322 2.765a9.208 9.208 0 0 0-2.215 4.41C-1.397 9.492 0.43 12.022 2.43 13.568a9.208 9.208 0 0 0 5.068 5.068c3.673.29 7.346-.137 9.886-2.765a9.208 9.208 0 0 0 2.215-4.41c.67-2.67-.683-5.2-3.157-6.746Z" />
+                </svg>
+                <!-- স্পিকার বন্ধ আইকন (ডিফল্টরূপে লুকানো) -->
+                <svg id="speakerOffIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 hidden">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.52 18.84-2.844 2.844A.75.75 0 0 1 7.601 21H2.25a.75.75 0 0 1-.75-.75V8.584a.75.75 0 0 1 .271-.573L9.613 1.559A2.25 2.25 0 0 1 12 3.284V12a.75.75 0 0 0 .67 1.071c1.196.386 2.316.516 3.018.516 1.487 0 2.417-.168 2.819-.319.467-.183.84-.442 1.144-.753.303-.31.562-.686.746-1.153.15-.39.319-1.32.319-2.812a.75.75 0 0 0-1.5-.06C18.96 11.83 17.58 12 16 12c-.524 0-1.01-.035-1.458-.106a.75.75 0 0 0-.67.747V21a.75.75 0 0 1-1.28.563Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M.75 13.5h.008v.008H.75V13.5Zm-.375 7.5h.008v.008H.375V21Zm.984-7.5H1.26v.008h-.008V13.5ZM.75 15h.008v.008H.75V15Zm.375 7.5h.008v.008h-.008V22.5Zm.984-7.5H1.26v.008h-.008V15Zm.743-6.44L2.3 8.351a.75.75 0 0 1 .53-.22H11.25a.75.75 0 0 1 .53.22L12.56 9.06a.75.75 0 0 1 0 1.06l-1.47 1.47-1.06 1.06-.01-.01L9.123 13.97a.75.75 0 0 1-1.06 0L.375 6.007a.75.75 0 0 1 0-1.06Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12h3.75a.75.75 0 0 0 0-1.5H15a.75.75 0 0 0 0 1.5Z" />
+                </svg>
+            </button>
+        </div>
 
-        <div id="userOutput" class="message-box user-message hidden"></div>
-        <div id="aiOutput" class="message-box ai-message hidden"></div>
-        <div id="loadingIndicator" class="loading-indicator">Thinking...</div>
+        <div id="conversationHistory" class="conversation-history">
+            <!-- কথোপকথনের বার্তাগুলি এখানে যোগ করা হবে -->
+            <div class="conversation-entry ai">নমস্কার! আমি আপনার এআই ভয়েস অ্যাসিস্ট্যান্ট। আপনি বাংলাতে প্রশ্ন করতে পারেন, আমি ইংরেজিতে উত্তর দেব।</div>
+        </div>
+
+        <div id="loadingIndicator" class="loading-indicator">ভাবছে...</div>
     </div>
 
     <script>
-        // Ensure the DOM is fully loaded before running script
+        // DOM সম্পূর্ণরূপে লোড হওয়ার পর স্ক্রিপ্টটি চালানোর জন্য নিশ্চিত করা হচ্ছে
         window.onload = function() {
+            // প্রয়োজনীয় DOM উপাদানগুলি নির্বাচন করা হচ্ছে
             const microphoneBtn = document.getElementById('microphoneBtn');
-            const userOutput = document.getElementById('userOutput');
-            const aiOutput = document.getElementById('aiOutput');
+            const speakerBtn = document.getElementById('speakerBtn');
+            const speakerOnIcon = document.getElementById('speakerOnIcon');
+            const speakerOffIcon = document.getElementById('speakerOffIcon');
+            const conversationHistory = document.getElementById('conversationHistory');
             const loadingIndicator = document.getElementById('loadingIndicator');
 
-            // Your API Key
+            // আপনার API কী
             const API_KEY = 'AIzaSyB6mshXEHwm39beIGlg76FNMjkw6Qz6kxU';
 
-            // Check for Web Speech API compatibility
+            // ওয়েব স্পিচ এপিআই সামঞ্জস্যপূর্ণতা পরীক্ষা করা হচ্ছে
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const SpeechSynthesis = window.speechSynthesis;
 
             if (!SpeechRecognition) {
-                userOutput.textContent = "Speech Recognition not supported in this browser. Please use Chrome or Edge.";
-                userOutput.classList.remove('hidden');
+                // যদি স্পিচ রিকগনিশন সমর্থিত না হয়, তাহলে বাংলাতে একটি বার্তা যোগ করা হবে
+                addMessageToHistory('ai', "দুঃখিত, এই ব্রাউজারে ভয়েস রিকগনিশন সমর্থিত নয়। অনুগ্রহ করে Chrome বা Edge ব্যবহার করুন।");
                 microphoneBtn.disabled = true;
                 microphoneBtn.style.cursor = 'not-allowed';
+                speakerBtn.disabled = true;
+                speakerBtn.style.cursor = 'not-allowed';
                 return;
             }
 
+            // স্পিচ রিকগনিশন সেটআপ
             const recognition = new SpeechRecognition();
-            recognition.continuous = false; // Stop after first utterance
-            recognition.lang = 'bn-BD'; // User speaks Bengali
-            recognition.interimResults = false; // Only final results
-            recognition.maxAlternatives = 1; // Only get the most probable result
+            recognition.continuous = false; // একটি উচ্চারণের পর বন্ধ হবে
+            recognition.lang = 'bn-BD'; // ব্যবহারকারী বাংলাতে কথা বলবেন
+            recognition.interimResults = false; // শুধুমাত্র চূড়ান্ত ফলাফল পাবে
+            recognition.maxAlternatives = 1; // শুধুমাত্র সবচেয়ে সম্ভাব্য ফলাফলটি পাবে
 
-            let isListening = false; // Track listening state
-            let englishVoice = null; // Variable to store the preferred English voice
+            let isListening = false; // শুনছে কিনা তার অবস্থা ট্র্যাক করে
+            let speakerEnabled = true; // স্পিকার ডিফল্টরূপে চালু আছে
+            let englishVoice = null; // পছন্দের ইংরেজি ভয়েস সংরক্ষণ করার জন্য ভেরিয়েবল
 
-            // This event fires when the list of SpeechSynthesisVoice objects changes.
-            // We'll use it to set our preferred English voice once available.
+            // SpeechSynthesisVoice অবজেক্টগুলির তালিকা পরিবর্তিত হলে এই ইভেন্টটি ফায়ার হয়।
+            // উপলব্ধ হলে আমাদের পছন্দের ইংরেজি ভয়েস সেট করতে এটি ব্যবহার করব।
             SpeechSynthesis.onvoiceschanged = () => {
                 const voices = SpeechSynthesis.getVoices();
                 const preferredVoiceNames = [
-                    'Google US English', // Often a good default
-                    'Samantha',          // Common on iOS/macOS
-                    'Alex',              // Common on iOS/macOS
-                    'Microsoft Zira - English (United States)', // Common on Windows
-                    'Microsoft David - English (United States)', // Common on Windows
-                    // Add more English voices here if needed
+                    'Google US English', // প্রায়শই একটি ভালো ডিফল্ট
+                    'Samantha',          // iOS/macOS এ সাধারণ
+                    'Alex',              // iOS/macOS এ সাধারণ
+                    'Microsoft Zira - English (United States)', // Windows এ সাধারণ
+                    'Microsoft David - English (United States)', // Windows এ সাধারণ
                 ];
 
-                englishVoice = null; // Reset
+                englishVoice = null; // রিসেট করা হলো
                 for (const name of preferredVoiceNames) {
                     const foundVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes(name));
                     if (foundVoice) {
                         englishVoice = foundVoice;
-                        console.log(`Preferred English voice found and set: ${name}`);
-                        break; // Found a good one, stop searching
+                        console.log(`পছন্দের ইংরেজি ভয়েস পাওয়া গেছে এবং সেট করা হয়েছে: ${name}`);
+                        break; // একটি ভালো ভয়েস পাওয়া গেছে, তাই খোঁজা বন্ধ করা হলো
                     }
                 }
 
                 if (!englishVoice) {
-                    // Fallback to any available 'en-US' voice if no preferred one is found
+                    // যদি কোনো পছন্দের ভয়েস না পাওয়া যায়, তাহলে যেকোনো উপলব্ধ 'en-US' ভয়েসে ফিরে যাবে
                     englishVoice = voices.find(voice => voice.lang === 'en-US');
                     if (!englishVoice) {
-                        console.warn("No 'en-US' voice found. Speech synthesis might use browser default or fail.");
+                        console.warn("কোনো 'en-US' ভয়েস পাওয়া যায়নি। স্পিচ সিন্থেসিস ব্রাউজারের ডিফল্ট ব্যবহার করতে পারে বা ব্যর্থ হতে পারে।");
                     } else {
-                        console.warn("No preferred English voice found, using first available 'en-US' voice:", englishVoice.name);
+                        console.warn("কোনো পছন্দের ইংরেজি ভয়েস পাওয়া যায়নি, প্রথম উপলব্ধ 'en-US' ভয়েস ব্যবহার করা হচ্ছে:", englishVoice.name);
                     }
                 }
             };
 
-            // Function to speak text in English
+            // ইংরেজিতে টেক্সট বলার জন্য ফাংশন
             function speak(text) {
-                if (SpeechSynthesis) {
+                if (SpeechSynthesis && speakerEnabled) { // শুধুমাত্র স্পিকার চালু থাকলে কথা বলবে
                     const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'en-US'; // AI speaks English
+                    utterance.lang = 'en-US'; // এআই ইংরেজিতে কথা বলবে
                     utterance.pitch = 1;
-                    utterance.rate = 1; // Normal speed
-                    utterance.volume = 1; // Max volume
+                    utterance.rate = 1; // স্বাভাবিক গতি
+                    utterance.volume = 1; // সর্বোচ্চ ভলিউম
 
-                    // Assign the pre-identified English voice if it's available
                     if (englishVoice) {
                         utterance.voice = englishVoice;
                     }
@@ -222,18 +291,32 @@
                         utterance.onend = resolve;
                     });
                 } else {
-                    console.warn("Speech Synthesis not supported.");
+                    if (!speakerEnabled) {
+                        console.log("স্পিকার বন্ধ আছে, কথা বলছে না।");
+                    } else {
+                        console.warn("স্পিচ সিন্থেসিস সমর্থিত নয়।");
+                    }
                     return Promise.resolve();
                 }
             }
 
-            // AI response logic - This is where you can integrate your custom API
+            // কথোপকথনের ইতিহাসে একটি বার্তা যোগ করার জন্য ফাংশন
+            function addMessageToHistory(type, text) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('conversation-entry', type);
+                messageElement.textContent = text;
+                conversationHistory.appendChild(messageElement);
+                // সর্বশেষ বার্তা দেখানোর জন্য নিচে স্ক্রল করবে
+                conversationHistory.scrollTop = conversationHistory.scrollHeight;
+            }
+
+            // এআই প্রতিক্রিয়া লজিক - এখানে আপনি আপনার কাস্টম এপিআই ইন্টিগ্রেট করতে পারেন
             async function getAIResponse(message) {
-                loadingIndicator.classList.add('active');
-                let response = "Sorry, I could not process your request. Please try again."; // Default fallback in English for API failure
+                loadingIndicator.classList.add('active'); // লোডিং ইন্ডিকেটর চালু করা হলো
+                let response = "Sorry, I could not process your request. Please try again."; // এপিআই ব্যর্থ হলে ডিফল্ট ইংরেজি ফলব্যাক
 
                 try {
-                    // Gemini API endpoint for gemini-2.0-flash
+                    // জেমিনি এপিআই এন্ডপয়েন্ট gemini-2.0-flash মডেলের জন্য
                     const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
                     
                     const payload = {
@@ -246,7 +329,7 @@
                                 ]
                             }
                         ],
-                        // Add systemInstruction to ensure the model translates the Bengali input and responds in English
+                        // সিস্টেম ইনস্ট্রাকশন যোগ করা হলো যাতে মডেল বাংলা ইনপুট অনুবাদ করে ইংরেজিতে উত্তর দেয়
                         systemInstruction: {
                             parts: [{ text: "You are a helpful AI assistant. The user will speak in Bengali. Translate their input to English and then respond in English only." }]
                         }
@@ -264,70 +347,72 @@
                         const result = await responseFromAPI.json();
                         const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                         if (aiText) {
-                            response = aiText;
+                            response = aiText; // এপিআই থেকে প্রাপ্ত প্রতিক্রিয়া
                         } else {
-                            console.error("API response format unexpected:", result);
-                            response = "Sorry, received an unexpected response from the API."; // Unexpected API response in English
+                            console.error("API প্রতিক্রিয়া বিন্যাস অপ্রত্যাশিত:", result);
+                            response = "Sorry, received an unexpected response from the API."; // অপ্রত্যাশিত এপিআই প্রতিক্রিয়া
                         }
                     } else {
                         const errorData = await responseFromAPI.json();
-                        console.error("API Error:", responseFromAPI.status, responseFromAPI.statusText, errorData);
-                        response = "Sorry, there was an issue processing your request. Please try again."; // Error message in English
+                        console.error("API ত্রুটি:", responseFromAPI.status, responseFromAPI.statusText, errorData);
+                        response = "Sorry, there was an issue processing your request. Please try again."; // এপিআই ত্রুটির বার্তা
                     }
                 } catch (error) {
-                    console.error("Network or API request failed:", error);
-                    response = "Network issue or API request failed."; // Network error message in English
+                    console.error("নেটওয়ার্ক বা এপিআই অনুরোধ ব্যর্থ হয়েছে:", error);
+                    response = "Network issue or API request failed."; // নেটওয়ার্ক ত্রুটির বার্তা
                 } finally {
-                    loadingIndicator.classList.remove('active');
+                    loadingIndicator.classList.remove('active'); // লোডিং ইন্ডিকেটর বন্ধ করা হলো
                 }
                 return response;
             }
 
-            // Event handler for when recognition starts
+            // রিকগনিশন শুরু হলে ইভেন্ট হ্যান্ডলার
             recognition.onstart = function() {
                 isListening = true;
                 microphoneBtn.classList.add('listening');
-                userOutput.classList.add('hidden');
-                aiOutput.classList.add('hidden');
-                loadingIndicator.classList.remove('active');
-                userOutput.textContent = "Listening...";
-                userOutput.classList.remove('hidden');
-                console.log('Voice recognition started.');
+                loadingIndicator.classList.add('active'); // লোডিং ইন্ডিকেটর চালু
+                addMessageToHistory('user', "শুনছি..."); // বাংলাতে "শুনছি..." বার্তা যোগ করা হলো
+                console.log('ভয়েস রিকগনিশন শুরু হয়েছে।');
             };
 
-            // Event handler for when a result is received
+            // ফলাফল পেলে ইভেন্ট হ্যান্ডলার
             recognition.onresult = async function(event) {
                 const transcript = event.results[0][0].transcript;
-                userOutput.textContent = `আপনি বললেন: "${transcript}"`; // Display user input in Bengali
-                userOutput.classList.remove('hidden');
-                console.log('User said:', transcript);
+                // ইতিহাসের শেষ বার্তা আপডেট করা বা 'শুনছি...' অস্থায়ী হলে নতুন যোগ করা
+                const lastMessage = conversationHistory.lastElementChild;
+                if (lastMessage && lastMessage.textContent === "শুনছি...") {
+                    lastMessage.textContent = `আপনি বললেন: "${transcript}"`; // বাংলাতে "আপনি বললেন: "..." প্রদর্শন করা হলো
+                    lastMessage.classList.add('user');
+                } else {
+                    addMessageToHistory('user', `আপনি বললেন: "${transcript}"`); // বাংলাতে "আপনি বললেন: "..." যোগ করা হলো
+                }
+                console.log('ব্যবহারকারী বললেন:', transcript);
 
-                // Get AI response and speak it
+                // এআই প্রতিক্রিয়া পাওয়া এবং কথা বলার জন্য
                 const aiResponse = await getAIResponse(transcript);
-                aiOutput.textContent = `AI: "${aiResponse}"`; // Display AI response in English
-                aiOutput.classList.remove('hidden');
-                await speak(aiResponse); // Now it should speak!
-                console.log('AI responded:', aiResponse);
+                addMessageToHistory('ai', `AI: "${aiResponse}"`); // ইংরেজিতে এআই প্রতিক্রিয়া প্রদর্শন করা হলো
+                await speak(aiResponse); // এখন এটি কথা বলবে!
+                console.log('এআই প্রতিক্রিয়া জানালো:', aiResponse);
             };
 
-            // Event handler for errors
+            // ত্রুটি হলে ইভেন্ট হ্যান্ডলার
             recognition.onerror = function(event) {
-                console.error('Speech recognition error:', event.error);
-                userOutput.textContent = `Error: ${event.error}. Please try again.`;
-                userOutput.classList.remove('hidden');
+                console.error('স্পিচ রিকগনিশন ত্রুটি:', event.error);
+                addMessageToHistory('ai', `Error: ${event.error}. Please try again.`); // ত্রুটির বার্তা ইংরেজিতে
                 microphoneBtn.classList.remove('listening');
                 isListening = false;
                 loadingIndicator.classList.remove('active');
             };
 
-            // Event handler for when recognition ends
+            // রিকগনিশন শেষ হলে ইভেন্ট হ্যান্ডলার
             recognition.onend = function() {
                 isListening = false;
                 microphoneBtn.classList.remove('listening');
-                console.log('Voice recognition ended.');
+                loadingIndicator.classList.remove('active'); // লোডিং ইন্ডিকেটর বন্ধ
+                console.log('ভয়েস রিকগনিশন শেষ হয়েছে।');
             };
 
-            // Click listener for the microphone button
+            // মাইক্রোফোন বোতামে ক্লিক শ্রোতা
             microphoneBtn.addEventListener('click', () => {
                 if (isListening) {
                     recognition.stop();
@@ -335,12 +420,30 @@
                     try {
                         recognition.start();
                     } catch (e) {
-                        console.error("Recognition already started or an error occurred:", e);
-                        userOutput.textContent = "Oops! Something went wrong. Please wait a moment and try again.";
-                        userOutput.classList.remove('hidden');
+                        console.error("রিকগনিশন ইতিমধ্যে শুরু হয়েছে বা একটি ত্রুটি ঘটেছে:", e);
+                        addMessageToHistory('ai', "Oops! Something went wrong. Please wait a moment and try again."); // ত্রুটির বার্তা ইংরেজিতে
                         microphoneBtn.classList.remove('listening');
                         isListening = false;
                     }
+                }
+            });
+
+            // স্পিকার বোতামে ক্লিক শ্রোতা
+            speakerBtn.addEventListener('click', () => {
+                speakerEnabled = !speakerEnabled; // স্পিকারের অবস্থা টগল করে
+                if (speakerEnabled) {
+                    speakerBtn.classList.remove('off');
+                    speakerOnIcon.classList.remove('hidden');
+                    speakerOffIcon.classList.add('hidden');
+                    console.log("স্পিকার চালু আছে");
+                    addMessageToHistory('ai', "Speaker is now ON."); // ইংরেজিতে বিজ্ঞপ্তি
+                } else {
+                    SpeechSynthesis.cancel(); // চলমান যেকোনো কথা বলা বন্ধ করে
+                    speakerBtn.classList.add('off');
+                    speakerOnIcon.classList.add('hidden');
+                    speakerOffIcon.classList.remove('hidden');
+                    console.log("স্পিকার বন্ধ আছে");
+                    addMessageToHistory('ai', "Speaker is now OFF."); // ইংরেজিতে বিজ্ঞপ্তি
                 }
             });
         };
