@@ -329,9 +329,9 @@
                                 ]
                             }
                         ],
-                        // সিস্টেম ইনস্ট্রাকশন যোগ করা হলো যাতে মডেল বাংলা ইনপুট অনুবাদ করে ইংরেজিতে উত্তর দেয়
+                        // সিস্টেম ইনস্ট্রাকশন পরিবর্তন করা হয়েছে: এখন মডেল সরাসরি বাংলা ইনপুট বুঝবে এবং ইংরেজিতে উত্তর দেবে।
                         systemInstruction: {
-                            parts: [{ text: "You are a helpful AI assistant. The user will speak in Bengali. Translate their input to English and then respond in English only." }]
+                            parts: [{ text: "You are a helpful AI assistant. The user will speak in Bengali. Understand the Bengali input and then respond in English only." }]
                         }
                     };
 
