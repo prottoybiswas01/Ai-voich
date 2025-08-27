@@ -45,7 +45,9 @@
             padding: 1.25rem;
             border-radius: 9999px; /* সম্পূর্ণ গোলাকার */
             cursor: pointer;
-            font-size: 2.5rem;
+            /* নতুন ইমেজ যোগ করার জন্য font-size সরিয়ে width ও height সেট করা হলো */
+            width: 4.5rem; /* বোতামের আকার ঠিক করতে */
+            height: 4.5rem;
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -141,6 +143,12 @@
             margin-right: auto; /* বামদিকে ঠেলে দেয় */
             color: #fffbeb;
         }
+        .microphone-button img {
+            width: 70%; /* ইমেজের আকার বোতামের মধ্যে ফিট করার জন্য */
+            height: 70%;
+            object-fit: contain; /* ইমেজকে বোতামের মধ্যে মানানসই করতে */
+            filter: invert(1); /* ইমেজের রঙ উল্টে সাদা করার জন্য, যদি কালো হয় */
+        }
 
         /* প্রতিক্রিয়াশীল সমন্বয় */
         @media (max-width: 600px) {
@@ -148,8 +156,8 @@
                 padding: 1.5rem;
             }
             .microphone-button, .speaker-button {
-                font-size: 2rem;
-                padding: 1rem;
+                width: 3.5rem; /* ছোট স্ক্রিনের জন্য আকার সমন্বয় */
+                height: 3.5rem;
             }
             .message-box {
                 font-size: 1rem;
@@ -174,13 +182,12 @@
 
         <div class="controls">
             <button id="microphoneBtn" class="microphone-button">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 10.5v3.75m0-7.5V1.5m7.5 7.5h-1.5m-6 0h-3M12 22.5c2.25 0 4.5-.75 4.5-2.25V18a4.5 4.5 0 0 0-4.5-4.5h-1.5a4.5 4.5 0 0 0-4.5 4.5v2.25c0 1.5 2.25 2.25 4.5 2.25z" />
-                </svg>
+                <!-- নতুন মাইক্রোফোন লোগো PNG লিঙ্ক থেকে -->
+                <img src="https://i.ibb.co/B50bdjHP/580-5801734-microphone-record-voice-microphone-radio-png-logo-transparent.png" alt="Microphone Icon" height="500" width="500" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333333?text=Mic';" />
             </button>
             <button id="speakerBtn" class="speaker-button">
                 <!-- স্পিকার চালু আইকন -->
-                <svg id="speakerOnIcon"  <img src="" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">>
+                <svg id="speakerOnIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.663a9.208 9.208 0 0 0-5.068-5.068C9.535-.29 5.862.137 3.322 2.765a9.208 9.208 0 0 0-2.215 4.41C.603 9.492 1.956 12.022 4.43 13.568a9.208 9.208 0 0 0 5.068 5.068c3.673.29 7.346-.137 9.886-2.765a9.208 9.208 0 0 0 2.215-4.41c.67-2.67-.683-5.2-3.157-6.746Z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.114 5.663a9.208 9.208 0 0 0-5.068-5.068C.535-.29 0.862.137 0.322 2.765a9.208 9.208 0 0 0-2.215 4.41C-1.397 9.492 0.43 12.022 2.43 13.568a9.208 9.208 0 0 0 5.068 5.068c3.673.29 7.346-.137 9.886-2.765a9.208 9.208 0 0 0 2.215-4.41c.67-2.67-.683-5.2-3.157-6.746Z" />
                 </svg>
