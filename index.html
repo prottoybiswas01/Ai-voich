@@ -39,25 +39,24 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .microphone-button, .speaker-button {
-            background: linear-gradient(45deg, #10b981 0%, #059669 100%);
+            background-color: rgba(255, 255, 255, 0.2); /* হালকা আধা-স্বচ্ছ সাদা ব্যাকগ্রাউন্ড */
             border: none;
             color: white;
             padding: 1.25rem;
             border-radius: 9999px; /* সম্পূর্ণ গোলাকার */
             cursor: pointer;
-            /* নতুন ইমেজ যোগ করার জন্য font-size সরিয়ে width ও height সেট করা হলো */
-            width: 4.5rem; /* বোতামের আকার ঠিক করতে */
-            height: 4.5rem;
+            width: 4.8rem; /* বোতামের আকার সামান্য বড় করা হলো */
+            height: 4.8rem;
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* শেডো সমন্বয় */
             transition: all 0.3s ease;
             position: relative;
         }
         .microphone-button:hover, .speaker-button:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+            transform: scale(1.08) translateY(-2px); /* হোভার এফেক্ট সামান্য বড় করা হলো */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* শেডো সমন্বয় */
         }
         .microphone-button:active, .speaker-button:active {
             transform: scale(0.98);
@@ -68,7 +67,7 @@
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
         }
         .speaker-button.off {
-            background: linear-gradient(45deg, #6b7280 0%, #4b5563 100%); /* বন্ধ অবস্থায় ধূসর */
+            background-color: rgba(100, 100, 100, 0.3); /* বন্ধ অবস্থায় ধূসর আধা-স্বচ্ছ */
         }
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
@@ -143,11 +142,11 @@
             margin-right: auto; /* বামদিকে ঠেলে দেয় */
             color: #fffbeb;
         }
-        .microphone-button img {
-            width: 70%; /* ইমেজের আকার বোতামের মধ্যে ফিট করার জন্য */
-            height: 70%;
+        .microphone-button img, .speaker-button img {
+            width: 80%; /* ইমেজের আকার বোতামের মধ্যে বড় করা হলো */
+            height: 80%;
             object-fit: contain; /* ইমেজকে বোতামের মধ্যে মানানসই করতে */
-            filter: invert(1); /* ইমেজের রঙ উল্টে সাদা করার জন্য, যদি কালো হয় */
+            /* filter: invert(1); /* ইমেজের রঙ উল্টানোর কোড সরানো হয়েছে */
         }
 
         /* প্রতিক্রিয়াশীল সমন্বয় */
@@ -156,8 +155,8 @@
                 padding: 1.5rem;
             }
             .microphone-button, .speaker-button {
-                width: 3.5rem; /* ছোট স্ক্রিনের জন্য আকার সমন্বয় */
-                height: 3.5rem;
+                width: 3.8rem; /* ছোট স্ক্রিনের জন্য আকার সমন্বয় */
+                height: 3.8rem;
             }
             .message-box {
                 font-size: 1rem;
@@ -177,21 +176,18 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-extrabold mb-4">ভয়েস অ্যাসিস্ট্যান্ট</h1>
+        <h1 class="text-3xl font-extrabold mb-4">AI Voice Assistant </h1>
         <p class="text-md text-gray-200 mb-6">কথা বলা শুরু করতে মাইক্রোফোন বোতাম টিপুন।</p>
 
         <div class="controls">
             <button id="microphoneBtn" class="microphone-button">
-                <!-- নতুন মাইক্রোফোন লোগো PNG লিঙ্ক থেকে -->
-                <img src="https://i.ibb.co/B50bdjHP/580-5801734-microphone-record-voice-microphone-radio-png-logo-transparent.png" alt="Microphone Icon" height="500" width="500" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333333?text=Mic';" />
+                <!-- মাইক্রোফোন লোগো -->
+                <img src="https://i.ibb.co/B50bdjHP/580-5801734-microphone-record-voice-microphone-radio-png-logo-transparent.png" alt="Microphone Icon" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333333?text=Mic';" />
             </button>
             <button id="speakerBtn" class="speaker-button">
                 <!-- স্পিকার চালু আইকন -->
-                <svg id="speakerOnIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.663a9.208 9.208 0 0 0-5.068-5.068C9.535-.29 5.862.137 3.322 2.765a9.208 9.208 0 0 0-2.215 4.41C.603 9.492 1.956 12.022 4.43 13.568a9.208 9.208 0 0 0 5.068 5.068c3.673.29 7.346-.137 9.886-2.765a9.208 9.208 0 0 0 2.215-4.41c.67-2.67-.683-5.2-3.157-6.746Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.114 5.663a9.208 9.208 0 0 0-5.068-5.068C.535-.29 0.862.137 0.322 2.765a9.208 9.208 0 0 0-2.215 4.41C-1.397 9.492 0.43 12.022 2.43 13.568a9.208 9.208 0 0 0 5.068 5.068c3.673.29 7.346-.137 9.886-2.765a9.208 9.208 0 0 0 2.215-4.41c.67-2.67-.683-5.2-3.157-6.746Z" />
-                </svg>
-                <!-- স্পিকার বন্ধ আইকন (ডিফল্টরূপে লুকানো) -->
+                <img id="speakerOnIcon" src="https://i.ibb.co/x8FCPWgk/images-q-tbn-ANd9-Gc-Rgqhvyvb-TWx0-Ri-Q6-aui-Sm-EUn1-UUAAafc-DVA-s.png" alt="Speaker On Icon" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333333?text=Speaker';" />
+                <!-- স্পিকার বন্ধ আইকন (আগের SVG, hidden রাখা হয়েছে) -->
                 <svg id="speakerOffIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 hidden">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m11.52 18.84-2.844 2.844A.75.75 0 0 1 7.601 21H2.25a.75.75 0 0 1-.75-.75V8.584a.75.75 0 0 1 .271-.573L9.613 1.559A2.25 2.25 0 0 1 12 3.284V12a.75.75 0 0 0 .67 1.071c1.196.386 2.316.516 3.018.516 1.487 0 2.417-.168 2.819-.319.467-.183.84-.442 1.144-.753.303-.31.562-.686.746-1.153.15-.39.319-1.32.319-2.812a.75.75 0 0 0-1.5-.06C18.96 11.83 17.58 12 16 12c-.524 0-1.01-.035-1.458-.106a.75.75 0 0 0-.67.747V21a.75.75 0 0 1-1.28.563Z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M.75 13.5h.008v.008H.75V13.5Zm-.375 7.5h.008v.008H.375V21Zm.984-7.5H1.26v.008h-.008V13.5ZM.75 15h.008v.008H.75V15Zm.375 7.5h.008v.008h-.008V22.5Zm.984-7.5H1.26v.008h-.008V15Zm.743-6.44L2.3 8.351a.75.75 0 0 1 .53-.22H11.25a.75.75 0 0 1 .53.22L12.56 9.06a.75.75 0 0 1 0 1.06l-1.47 1.47-1.06 1.06-.01-.01L9.123 13.97a.75.75 0 0 1-1.06 0L.375 6.007a.75.75 0 0 1 0-1.06Z" />
@@ -440,15 +436,15 @@
                 speakerEnabled = !speakerEnabled; // স্পিকারের অবস্থা টগল করে
                 if (speakerEnabled) {
                     speakerBtn.classList.remove('off');
-                    speakerOnIcon.classList.remove('hidden');
-                    speakerOffIcon.classList.add('hidden');
+                    speakerOnIcon.classList.remove('hidden'); // নতুন ইমেজ অন আইকন দেখা যাবে
+                    speakerOffIcon.classList.add('hidden'); // অফ আইকন লুকানো থাকবে
                     console.log("স্পিকার চালু আছে");
                     addMessageToHistory('ai', "Speaker is now ON."); // ইংরেজিতে বিজ্ঞপ্তি
                 } else {
                     SpeechSynthesis.cancel(); // চলমান যেকোনো কথা বলা বন্ধ করে
                     speakerBtn.classList.add('off');
-                    speakerOnIcon.classList.add('hidden');
-                    speakerOffIcon.classList.remove('hidden');
+                    speakerOnIcon.classList.add('hidden'); // নতুন ইমেজ অন আইকন লুকানো থাকবে
+                    speakerOffIcon.classList.remove('hidden'); // অফ আইকন দেখা যাবে
                     console.log("স্পিকার বন্ধ আছে");
                     addMessageToHistory('ai', "Speaker is now OFF."); // ইংরেজিতে বিজ্ঞপ্তি
                 }
