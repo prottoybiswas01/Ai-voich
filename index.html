@@ -167,6 +167,26 @@
             recognition.maxAlternatives = 1; // Only get the most probable result
 
             let isListening = false; // Track listening state
+            let englishVoice = null; // Variable to store the preferred English voice
+
+            // This event fires when the list of SpeechSynthesisVoice objects changes.
+            // We'll use it to set our preferred English voice once available.
+            SpeechSynthesis.onvoiceschanged = () => {
+                const voices = SpeechSynthesis.getVoices();
+                // Try to find a 'Google US English' voice first, as it's often a good quality option.
+                englishVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google US English'));
+                if (!englishVoice) {
+                    // Fallback to any available 'en-US' voice if the preferred one isn't found.
+                    englishVoice = voices.find(voice => voice.lang === 'en-US');
+                    if (!englishVoice) {
+                        console.warn("No 'en-US' voice found. Speech synthesis might use browser default or fail.");
+                    } else {
+                        console.warn("Preferred 'Google US English' voice not found, using first available 'en-US' voice.");
+                    }
+                } else {
+                    console.log("Preferred 'Google US English' voice found and set.");
+                }
+            };
 
             // Function to speak text in English
             function speak(text) {
@@ -177,16 +197,11 @@
                     utterance.rate = 1; // Normal speed
                     utterance.volume = 1; // Max volume
 
-                    // Set an English voice if available
-                    utterance.onvoiceschanged = () => {
-                        const voices = SpeechSynthesis.getVoices();
-                        const preferredVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google US English')); // Find a suitable English voice
-                        if (preferredVoice) {
-                            utterance.voice = preferredVoice;
-                        } else {
-                            console.warn("No preferred English voice found. Falling back to default.");
-                        }
-                    };
+                    // Assign the pre-identified English voice if it's available
+                    if (englishVoice) {
+                        utterance.voice = englishVoice;
+                    }
+
                     SpeechSynthesis.speak(utterance);
                     return new Promise(resolve => {
                         utterance.onend = resolve;
@@ -276,7 +291,7 @@
                 const aiResponse = await getAIResponse(transcript);
                 aiOutput.textContent = `AI: "${aiResponse}"`; // Display AI response in English
                 aiOutput.classList.remove('hidden');
-                await speak(aiResponse);
+                await speak(aiResponse); // Now it should speak!
                 console.log('AI responded:', aiResponse);
             };
 
