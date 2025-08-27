@@ -173,18 +173,33 @@
             // We'll use it to set our preferred English voice once available.
             SpeechSynthesis.onvoiceschanged = () => {
                 const voices = SpeechSynthesis.getVoices();
-                // Try to find a 'Google US English' voice first, as it's often a good quality option.
-                englishVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google US English'));
+                const preferredVoiceNames = [
+                    'Google US English', // Often a good default
+                    'Samantha',          // Common on iOS/macOS
+                    'Alex',              // Common on iOS/macOS
+                    'Microsoft Zira - English (United States)', // Common on Windows
+                    'Microsoft David - English (United States)', // Common on Windows
+                    // Add more English voices here if needed
+                ];
+
+                englishVoice = null; // Reset
+                for (const name of preferredVoiceNames) {
+                    const foundVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes(name));
+                    if (foundVoice) {
+                        englishVoice = foundVoice;
+                        console.log(`Preferred English voice found and set: ${name}`);
+                        break; // Found a good one, stop searching
+                    }
+                }
+
                 if (!englishVoice) {
-                    // Fallback to any available 'en-US' voice if the preferred one isn't found.
+                    // Fallback to any available 'en-US' voice if no preferred one is found
                     englishVoice = voices.find(voice => voice.lang === 'en-US');
                     if (!englishVoice) {
                         console.warn("No 'en-US' voice found. Speech synthesis might use browser default or fail.");
                     } else {
-                        console.warn("Preferred 'Google US English' voice not found, using first available 'en-US' voice.");
+                        console.warn("No preferred English voice found, using first available 'en-US' voice:", englishVoice.name);
                     }
-                } else {
-                    console.log("Preferred 'Google US English' voice found and set.");
                 }
             };
 
