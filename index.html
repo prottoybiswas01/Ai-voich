@@ -246,9 +246,9 @@
                                 ]
                             }
                         ],
-                        // Add systemInstruction to ensure the model responds in English
+                        // Add systemInstruction to ensure the model translates the Bengali input and responds in English
                         systemInstruction: {
-                            parts: [{ text: "You are a helpful AI assistant. Respond in English only." }]
+                            parts: [{ text: "You are a helpful AI assistant. The user will speak in Bengali. Translate their input to English and then respond in English only." }]
                         }
                     };
 
